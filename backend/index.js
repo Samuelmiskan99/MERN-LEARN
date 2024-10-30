@@ -293,6 +293,76 @@ app.delete('/delete-story/:id', authenticateToken, async (req, res) => {
    }
 })
 
+// update isFavorite
+app.put('/update-favorite/:id', authenticateToken, async (req, res) => {
+   const { id } = req.params
+   const { isFavorite } = req.body
+   const { userId } = req.user
+
+   try {
+      const travelStory = await TravelStory.findOne({ _id: id, userId: userId })
+      if (!travelStory) {
+         return res.status(404).json({ error: true, message: 'Travel story not found' })
+      }
+
+      travelStory.isFavorite = isFavorite
+
+      await travelStory.save()
+      res.status(200).json({ story: travelStory, message: 'Travel story updated successfully' })
+   } catch (error) {
+      res.status(500).json({ error: true, message: error.message })
+   }
+})
+
+// Search Travel story
+app.get('/search-story', authenticateToken, async (req, res) => {
+   const { userId } = req.user
+   const { query } = req.query
+
+   if (!query) {
+      return res.status(404).json({ error: true, message: 'Query is required' })
+   }
+
+   try {
+      const searchResults = await TravelStory.find({
+         userId: userId,
+         $or: [
+            { title: { $regex: query, $options: 'i' } },
+            { story: { $regex: query, $options: 'i' } },
+            { visitedLocation: { $regex: query, $options: 'i' } },
+         ],
+      }).sort({ isFavorite: -1 })
+
+      res.status(200).json({ stories: searchResults })
+   } catch (error) {
+      res.status(500).json({ error: true, message: error.message })
+   }
+})
+
+//filter travel stories by date range
+app.get('/filter-story', authenticateToken, async (req, res) => {
+   const { startDate, endDate } = req.query
+   const { userId } = req.user
+
+   try {
+      //conver startDate dan endDate to date object
+      const start = new Date(parseInt(startDate))
+      const end = new Date(parseInt(endDate))
+
+      // find travel stories that belong to the authenticated user and fall within the date range
+      const filteredStories = await TravelStory.find({
+         userId: userId,
+         visitedDate: { $gte: start, $lte: end },
+      }).sort({ isFavorite: -1 })
+
+      res.status(200).json({ stories: filteredStories })
+   } catch {
+      error
+   }
+   {
+   }
+})
+
 app.listen(8000, () => {
    console.log('Backend server is running on port 8000')
 })

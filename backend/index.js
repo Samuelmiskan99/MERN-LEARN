@@ -68,7 +68,8 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({ error: true, message: 'User not found' })
    }
 
-   const isPasswordValid = await bcrpyt.compare(password, user.password)
+   // Fix: Corrected `bcrpyt` to `bcrypt`
+   const isPasswordValid = await bcrypt.compare(password, user.password)
    if (!isPasswordValid) {
       return res.status(400).json({ error: true, message: 'Invalid Credentials' })
    }

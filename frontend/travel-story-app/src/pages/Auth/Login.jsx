@@ -22,20 +22,18 @@ const Login = () => {
       }
       setError('')
 
-      //login API call
       try {
          const response = await axiosInstance.post('/login', {
             email: email,
             password: password,
          })
          // Handle successful login response
-         if (response.data && response.data.accessToken) {
-            localStorage.setItem('token', response.data.accessToken)
-            navigate('/dashboard')
+         if (response.data && response.data.user && response.data.user.accessToken) {
+            localStorage.setItem('token', response.data.user.accessToken)
+            navigate('/dashboard') // This should now redirect correctly
          }
       } catch (error) {
-         console.error('Login error:', error) // Log the full error object for debugging
-
+         console.error('Login error:', error)
          if (error.response && error.response.status === 400 && error.response.data) {
             setError(error.response.data.message)
          } else {
@@ -62,7 +60,7 @@ const Login = () => {
                </div>
             </div>
             <div className='w-2/4 h-[75vh] bg-white rounded-r-lg relative p-16 shadow-lg shadow-cyan-200/20'>
-               <form  onSubmit={handleLogin}>
+               <form onSubmit={handleLogin}>
                   <h4 className='text-2xl font-semibold mb-7'>Login</h4>
                   <input
                      type='text'

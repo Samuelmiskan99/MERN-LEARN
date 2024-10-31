@@ -13,7 +13,10 @@ const path = require('path')
 
 const { authenticateToken } = require('./utilities')
 
-mongoose.connect(config.connectionString)
+mongoose
+   .connect(config.connectionString, { useNewUrlParser: true, useUnifiedTopology: true })
+   .then(() => console.log('Database connected successfully'))
+   .catch((error) => console.error('Database connection error:', error))
 
 const User = require('./models/user.model')
 const TravelStory = require('./models/travelStory.model')
@@ -67,7 +70,6 @@ app.post('/login', async (req, res) => {
    if (!user) {
       return res.status(400).json({ error: true, message: 'User not found' })
    }
-
    // Fix: Corrected `bcrpyt` to `bcrypt`
    const isPasswordValid = await bcrypt.compare(password, user.password)
    if (!isPasswordValid) {
@@ -355,15 +357,16 @@ app.get('/filter-story', authenticateToken, async (req, res) => {
          userId: userId,
          visitedDate: { $gte: start, $lte: end },
       }).sort({ isFavorite: -1 })
-
       res.status(200).json({ stories: filteredStories })
    } catch {
       error
    }
    {
+      res.status(500).json({ error: true, message: error.message })
+   }
+   {
    }
 })
-
 app.listen(8000, () => {
    console.log('Backend server is running on port 8000')
 })

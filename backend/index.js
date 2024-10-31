@@ -117,13 +117,11 @@ app.post('/image-upload', upload.single('image'), async (req, res) => {
          return res.status(400).json({ error: true, message: 'No image uploaded' })
       }
 
-      const imageUrl = `http://localhost:8000/uploads/${req.file.filename}`
+      const imageUrl = `http://localhost:8000/uploads/${req.file.filename}` // Full URL for the frontend
+      console.log('Uploaded image URL:', imageUrl) // Log to verify
 
       res.status(201).json({ error: false, imageUrl })
-   } catch {
-      error
-   }
-   {
+   } catch (error) {
       res.status(500).json({ error: true, message: error.message })
    }
 })
@@ -193,7 +191,7 @@ app.post('/add-travel-story', authenticateToken, async (req, res) => {
 app.get('/get-all-stories', authenticateToken, async (req, res) => {
    const { userId } = req.user
    try {
-      const travelStories = await TravelStory.find({ userId }).sort({ isFavorite: -1 })
+      const travelStories = await TravelStory.find({ userId: userId }).sort({ isFavorite: -1 })
       res.status(200).json({ stories: travelStories })
    } catch (error) {
       res.status(500).json({
@@ -202,7 +200,6 @@ app.get('/get-all-stories', authenticateToken, async (req, res) => {
       })
    }
 })
-
 //Edit Travel Story
 app.post('/edit-story/:id', authenticateToken, async (req, res) => {
    const { id } = req.params
@@ -363,8 +360,6 @@ app.get('/filter-story', authenticateToken, async (req, res) => {
    }
    {
       res.status(500).json({ error: true, message: error.message })
-   }
-   {
    }
 })
 app.listen(8000, () => {

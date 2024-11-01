@@ -1,13 +1,25 @@
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar'
 import axiosInstance from '../../utils/axiosInstance'
+import { MdAdd } from 'react-icons/md'
+import Modal from 'react-modal'
+
 import { useEffect, useState } from 'react'
 import TravelStoryCard from '../../components/Cards/TravelStoryCard'
+
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import AddEditTravelStory from './AddEditTravelStory'
 
 const Home = () => {
    const navigate = useNavigate()
    const [userInfo, setUserInfo] = useState({})
    const [allStories, setAllStories] = useState([])
+   const [openAddEditModal, setOpenAddEditModal] = useState({
+      isShow: false,
+      type: 'add',
+      data: null,
+   })
 
    // Get user info
    const getUserInfo = async () => {
@@ -50,8 +62,21 @@ const Home = () => {
    }
 
    // Handle update favorite
-   const handleUpdateFavorite = (storyData) => {
+   const handleUpdateFavorite = async (storyData) => {
+      const storyId = storyData._id
       console.log('Update favorite:', storyData)
+
+      try {
+         const response = await axiosInstance.put(`/update-favorite/${storyId}`, {
+            isFavorite: !storyData.isFavorite,
+         })
+         if (response.data && response.data.story) {
+            toast.success('Travel story updated successfully')
+            getAllTravelStories()
+         }
+      } catch (error) {
+         console.error('An unexpected error occurred. please try again', error)
+      }
    }
 
    useEffect(() => {
@@ -89,6 +114,28 @@ const Home = () => {
                <div className='w-[320px]'></div>
             </div>
          </div>
+
+         {/* Add and edit travel story modal */}
+         <Modal
+            isOpen={openAddEditModal.isShow}
+            onRequestClose={() => {}}
+            style={{ overlay: { backgroundColor: 'rgba(0, 0, 0,0.2)', zIndex: 999 } }}
+            appElement={document.getElementById('root')}
+            className='model-box'>
+            <AddEditTravelStory
+               type={openAddEditModal.type}
+               storyInfo={openAddEditModal.data}
+               onClose={() => setOpenAddEditModal({ isShow: false, type: 'add', data: null })}
+               getAllTravelStories={getAllTravelStories}
+            />
+         </Modal>
+         <button
+            className='w-16 h-16 flex items-center justify-center rounded-full bg-primary hover:bg-cyan-400 fixed right-10 bottom-10'
+            onClick={() => setOpenAddEditModal({ isShow: true, type: 'add', data: null })}>
+            <MdAdd className='text-[32px] text-white ' />
+         </button>
+
+         <ToastContainer />
       </>
    )
 }

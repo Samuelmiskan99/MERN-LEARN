@@ -7,7 +7,7 @@ import moment from 'moment'
 import axiosInstance from '../../utils/axiosInstance'
 import uploadImage from '../../utils/uploadImage'
 import { toast } from 'react-toastify'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) => {
    const [title, setTitle] = useState(storyInfo?.title || '')
@@ -106,7 +106,32 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
    }
 
    //handle delete story and update story
-   const handleDeleteStoryImg = async () => {}
+   const handleDeleteStoryImg = async () => {
+      //deleting the image
+      const deleteImageRes = await axiosInstance.delete('/delete-image', {
+         params: {
+            imageUrl: storyInfo.imageUrl,
+         },
+      })
+      if (deleteImageRes.data && deleteImageRes.data.imageUrl) {
+         const storyId = storyInfo._id
+         const postData = {
+            title,
+            story,
+            visitedLocation,
+            imageUrl: '',
+            visitedDate: visitedDate ? moment(visitedDate).valueOf() : moment().valueOf(),
+         }
+         //updating story
+         const response = await axiosInstance.put('/edit-story/' + storyId, postData)
+         setStoryImg(null)
+         if (response.data && response.data.story) {
+            toast.success('Story Updated Successfully')
+            getAllTravelStories()
+            onClose()
+         }
+      }
+   }
 
    return (
       <div className='relative'>
@@ -188,6 +213,6 @@ AddEditTravelStory.propTypes = {
    type: PropTypes.oneOf(['add', 'edit']).isRequired,
    onClose: PropTypes.func.isRequired,
    getAllTravelStories: PropTypes.func.isRequired,
-};
+}
 
 export default AddEditTravelStory

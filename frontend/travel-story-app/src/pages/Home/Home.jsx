@@ -12,6 +12,9 @@ import 'react-toastify/dist/ReactToastify.css'
 import AddEditTravelStory from './AddEditTravelStory'
 import ViewTravelStory from './ViewTravelStory'
 
+import ImageEmpty from '../../assets/images/nothing-here.svg'
+import EmptyCards from '../../components/Cards/EmptyCards'
+
 const Home = () => {
    const navigate = useNavigate()
    const [userInfo, setUserInfo] = useState({})
@@ -82,6 +85,21 @@ const Home = () => {
       }
    }
 
+   //Handle Delete Story
+   const deleteTravelStory = async (data) => {
+      const storyId = data._id
+      try {
+         const response = await axiosInstance.delete(`/delete-story/${storyId}`)
+         if (response.data && !response.data.error) {
+            toast.error('Travel story deleted successfully')
+            setOpenViewModal((prev) => ({ ...prev, isShow: false }))
+            getAllTravelStories()
+         }
+      } catch (error) {
+         console.error('An unexpected error occurred. please try again', error)
+      }
+   }
+
    useEffect(() => {
       getAllTravelStories()
       getUserInfo()
@@ -110,7 +128,12 @@ const Home = () => {
                         ))}
                      </div>
                   ) : (
-                     <p className='text-center text-gray-500'>No travel stories available.</p>
+                     <EmptyCards
+                        imageSrc={ImageEmpty}
+                        message={`Start creating your first travel story!. you can just click on the add button to write down  your travel story and share with us your journey and memories. Let's get started `}
+                     />
+
+                     // <p className='text-center text-gray-500'>No travel stories available.</p>
                   )}
                </div>
                <div className='w-[320px]'></div>
@@ -148,7 +171,9 @@ const Home = () => {
                   setOpenViewModal((prevState) => ({ ...prevState, isShow: false }))
                   handleEdit(openViewModal.data || null)
                }}
-               onDeleteClick={() => {}}
+               onDeleteClick={() => {
+                  deleteTravelStory(openViewModal.data || null)
+               }}
             />
          </Modal>
          <button

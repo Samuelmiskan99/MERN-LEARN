@@ -43,6 +43,10 @@ const Home = () => {
       }
    }
 
+   //edit travel
+   const handleEdit = (data) => {
+      setOpenAddEditModal({ isShow: true, type: 'edit', data: data })
+   }
    // Get all travel stories
    const getAllTravelStories = async () => {
       try {
@@ -137,8 +141,13 @@ const Home = () => {
             {' '}
             <ViewTravelStory
                storyInfo={openViewModal.data || null}
-               onClose={() => {}}
-               onEditClick={() => {}}
+               onClose={() => {
+                  setOpenViewModal((prevState) => ({ ...prevState, isShow: false }))
+               }}
+               onEditClick={() => {
+                  setOpenViewModal((prevState) => ({ ...prevState, isShow: false }))
+                  handleEdit(openViewModal.data || null)
+               }}
                onDeleteClick={() => {}}
             />
          </Modal>

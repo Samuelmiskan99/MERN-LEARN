@@ -7,15 +7,15 @@ import moment from 'moment'
 import axiosInstance from '../../utils/axiosInstance'
 import uploadImage from '../../utils/uploadImage'
 import { toast } from 'react-toastify'
+import PropTypes from 'prop-types';
 
 const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) => {
-   const [title, setTitle] = useState('')
-   const [storyImg, setStoryImg] = useState(null)
-   const [story, setStory] = useState('')
-   const [visitedLocation, setVisitedLocation] = useState([])
-
+   const [title, setTitle] = useState(storyInfo?.title || '')
+   const [storyImg, setStoryImg] = useState(storyInfo?.imageUrl || null)
+   const [story, setStory] = useState(storyInfo?.story || '')
+   const [visitedLocation, setVisitedLocation] = useState(storyInfo?.visitedLocation || [])
+   const [visitedDate, setVisitedDate] = useState(storyInfo?.visitedDate || null)
    const [error, setError] = useState('')
-   const [visitedDate, setVisitedDate] = useState(null)
 
    //add new Travel Story
    const addNewTravelStory = async () => {
@@ -42,11 +42,50 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
             onClose()
          }
       } catch (error) {
-         setError(error.message)
+         if (error.response && error.response.data && error.response.data.message) {
+            setError(error.response.data.message)
+         } else {
+            setError('Something went wrong, please try again later')
+         }
       }
    }
    //update Travel Story
-   const updateTravelStory = async () => {}
+   const updateTravelStory = async () => {
+      const storyId = storyInfo._id
+      try {
+         let imageUrl = storyInfo.imageUrl || ''
+         let postData = {
+            title,
+            story,
+            visitedLocation,
+            imageUrl,
+            visitedDate: visitedDate ? moment(visitedDate).valueOf() : moment().valueOf(),
+         }
+
+         // If a new image file is selected, upload it and update the imageUrl
+         if (typeof storyImg === 'object') {
+            const imgUploadRes = await uploadImage(storyImg)
+            imageUrl = imgUploadRes.imageUrl || ''
+            postData = {
+               ...postData,
+               imageUrl: imageUrl || '',
+            }
+         }
+
+         const response = await axiosInstance.put('/edit-story/' + storyId, postData)
+         if (response.data && response.data.story) {
+            toast.success('Story Updated Successfully')
+            getAllTravelStories()
+            onClose()
+         }
+      } catch (error) {
+         if (error.response && error.response.data && error.response.data.message) {
+            setError(error.response.data.message)
+         } else {
+            setError('Something went wrong, please try again later')
+         }
+      }
+   }
 
    const handleAddorUpdateClick = () => {
       console.log('input Data', { title, storyImg, story, visitedLocation, visitedDate })
@@ -136,5 +175,19 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
       </div>
    )
 }
+
+AddEditTravelStory.propTypes = {
+   storyInfo: PropTypes.shape({
+      title: PropTypes.string,
+      imageUrl: PropTypes.string,
+      story: PropTypes.string,
+      visitedLocation: PropTypes.arrayOf(PropTypes.string),
+      visitedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      _id: PropTypes.string,
+   }),
+   type: PropTypes.oneOf(['add', 'edit']).isRequired,
+   onClose: PropTypes.func.isRequired,
+   getAllTravelStories: PropTypes.func.isRequired,
+};
 
 export default AddEditTravelStory

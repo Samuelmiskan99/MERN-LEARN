@@ -201,7 +201,7 @@ app.get('/get-all-stories', authenticateToken, async (req, res) => {
    }
 })
 //Edit Travel Story
-app.post('/edit-story/:id', authenticateToken, async (req, res) => {
+app.put('/edit-story/:id', authenticateToken, async (req, res) => {
    const { id } = req.params
    const { title, story, visitedLocation, imageUrl, visitedDate } = req.body
    const { userId } = req.user

@@ -10,6 +10,7 @@ import TravelStoryCard from '../../components/Cards/TravelStoryCard'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import AddEditTravelStory from './AddEditTravelStory'
+import ViewTravelStory from './ViewTravelStory'
 
 const Home = () => {
    const navigate = useNavigate()
@@ -18,6 +19,10 @@ const Home = () => {
    const [openAddEditModal, setOpenAddEditModal] = useState({
       isShow: false,
       type: 'add',
+      data: null,
+   })
+   const [openViewModal, setOpenViewModal] = useState({
+      isShow: false,
       data: null,
    })
 
@@ -51,14 +56,8 @@ const Home = () => {
       }
    }
 
-   // Handle edit story click
-   const handleEdit = (data) => {
-      console.log('Edit story:', data)
-   }
-
-   // Handle travel story click
    const handleViewStory = (data) => {
-      console.log('View story:', data)
+      setOpenViewModal({ isShow: true, data })
    }
 
    // Handle update favorite
@@ -101,7 +100,6 @@ const Home = () => {
                               visitedLocation={item.visitedLocation}
                               date={item.visitedDate}
                               isFavorite={item.isFavorite}
-                              onEdit={() => handleEdit(item)}
                               onClick={() => handleViewStory(item)}
                               onFavoriteClick={() => handleUpdateFavorite(item)}
                            />
@@ -127,6 +125,21 @@ const Home = () => {
                storyInfo={openAddEditModal.data}
                onClose={() => setOpenAddEditModal({ isShow: false, type: 'add', data: null })}
                getAllTravelStories={getAllTravelStories}
+            />
+         </Modal>
+         {/* Add and edit travel story modal */}
+         <Modal
+            isOpen={openViewModal.isShow}
+            onRequestClose={() => {}}
+            style={{ overlay: { backgroundColor: 'rgba(0, 0, 0,0.2)', zIndex: 999 } }}
+            appElement={document.getElementById('root')}
+            className='model-box'>
+            {' '}
+            <ViewTravelStory
+               storyInfo={openViewModal.data || null}
+               onClose={() => {}}
+               onEditClick={() => {}}
+               onDeleteClick={() => {}}
             />
          </Modal>
          <button

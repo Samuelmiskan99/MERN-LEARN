@@ -21,7 +21,6 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
    const addNewTravelStory = async () => {
       try {
          let imageUrl = ''
-
          //upload image if present
          if (storyImg) {
             const imageUpLoadRes = await uploadImage(storyImg)
@@ -71,7 +70,7 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
    const handleDeleteStoryImg = async () => {}
 
    return (
-      <div>
+      <div className='relative'>
          <div className='flex items-center justify-between '>
             <h5 className='text-xl font-medium text-slate-700'>
                {type === 'add' ? 'Add Travel Story' : 'Update Travel Story'}

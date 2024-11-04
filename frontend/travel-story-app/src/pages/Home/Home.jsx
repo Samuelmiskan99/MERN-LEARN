@@ -12,10 +12,11 @@ import 'react-toastify/dist/ReactToastify.css'
 import AddEditTravelStory from './AddEditTravelStory'
 import ViewTravelStory from './ViewTravelStory'
 
-import ImageEmpty from '../../assets/images/nothing-here.svg'
 import EmptyCards from '../../components/Cards/EmptyCards'
 import { DayPicker } from 'react-day-picker'
 import moment from 'moment'
+import FilterInfoTitle from '../../components/Cards/FilterInfoTitle'
+import { getEmptyCardImage, getEmptyCardMessage } from '../../utils/helper'
 
 const Home = () => {
    const navigate = useNavigate()
@@ -87,7 +88,14 @@ const Home = () => {
          })
          if (response.data && response.data.story) {
             toast.success('Travel story updated successfully')
-            getAllTravelStories()
+
+            if (filterType === 'search' && searchQuery) {
+               onSearchStory(searchQuery)
+            } else if (filterType === 'date') {
+               filterStoriesByDate(dateRange)
+            } else {
+               getAllTravelStories()
+            }
          }
       } catch (error) {
          console.error('An unexpected error occurred. please try again', error)
@@ -152,6 +160,13 @@ const Home = () => {
       setDateRange(day)
       filterStoriesByDate(day)
    }
+
+   //reset filter
+   const resetFilter = () => {
+      setDateRange({ from: null, to: null })
+      setFilterType('')
+      getAllTravelStories()
+   }
    useEffect(() => {
       getAllTravelStories()
       getUserInfo()
@@ -167,6 +182,13 @@ const Home = () => {
             handleClearSearch={handleClearSearch}
          />
          <div className='container mx-auto py-10'>
+            <FilterInfoTitle
+               filterType={filterType}
+               filterDates={dateRange}
+               onClear={() => {
+                  resetFilter()
+               }}
+            />
             <div className='flex gap-7'>
                <div className='flex-1'>
                   {allStories.length > 0 ? (
@@ -187,8 +209,8 @@ const Home = () => {
                      </div>
                   ) : (
                      <EmptyCards
-                        imageSrc={ImageEmpty}
-                        message={`Start creating your first travel story!. you can just click on the add button to write down  your travel story and share with us your journey and memories. Let's get started `}
+                        imageSrc={getEmptyCardImage(filterType)}
+                        message={getEmptyCardMessage(filterType)}
                      />
 
                      // <p className='text-center text-gray-500'>No travel stories available.</p>

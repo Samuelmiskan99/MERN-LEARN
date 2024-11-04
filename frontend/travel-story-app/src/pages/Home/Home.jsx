@@ -14,6 +14,8 @@ import ViewTravelStory from './ViewTravelStory'
 
 import ImageEmpty from '../../assets/images/nothing-here.svg'
 import EmptyCards from '../../components/Cards/EmptyCards'
+import { DayPicker } from 'react-day-picker'
+import moment from 'moment'
 
 const Home = () => {
    const navigate = useNavigate()
@@ -28,6 +30,13 @@ const Home = () => {
       isShow: false,
       data: null,
    })
+
+   //range picker
+   const [dateRange, setDateRange] = useState({ form: null, to: null })
+
+   //searchbar
+   const [searchQuery, setSearchQuery] = useState('')
+   const [filterType, setFilterType] = useState('')
 
    // Get user info
    const getUserInfo = async () => {
@@ -100,6 +109,49 @@ const Home = () => {
       }
    }
 
+   //handle Search Story
+   const onSearchStory = async (query) => {
+      try {
+         const response = await axiosInstance.get(`/search-story`, { params: { query } })
+         if (response.data && response.data.stories) {
+            setAllStories(response.data.stories)
+            setFilterType('search')
+         }
+      } catch (error) {
+         console.error('An unexpected error occurred. please try again', error)
+      }
+   }
+
+   //handle Clear Search
+   const handleClearSearch = () => {
+      setFilterType('')
+      getAllTravelStories()
+   }
+
+   //filter stories by date
+   const filterStoriesByDate = async (day) => {
+      try {
+         const startDate = day.from ? moment(day.from).valueOf() : null
+         const endDate = day.to ? moment(day.to).valueOf() : null
+
+         if (startDate && endDate) {
+            const response = await axiosInstance.get('/filter-story', {
+               params: { startDate, endDate },
+            })
+            if (response.data && response.data.stories) {
+               setFilterType('date')
+               setAllStories(response.data.stories)
+            }
+         }
+      } catch (error) {
+         console.error('An unexpected error occurred. please try again', error)
+      }
+   }
+   //date range picker
+   const handleDayClick = (day) => {
+      setDateRange(day)
+      filterStoriesByDate(day)
+   }
    useEffect(() => {
       getAllTravelStories()
       getUserInfo()
@@ -107,7 +159,13 @@ const Home = () => {
 
    return (
       <>
-         <Navbar userInfo={userInfo} />
+         <Navbar
+            userInfo={userInfo}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearchNote={onSearchStory}
+            handleClearSearch={handleClearSearch}
+         />
          <div className='container mx-auto py-10'>
             <div className='flex gap-7'>
                <div className='flex-1'>
@@ -136,7 +194,19 @@ const Home = () => {
                      // <p className='text-center text-gray-500'>No travel stories available.</p>
                   )}
                </div>
-               <div className='w-[320px]'></div>
+               <div className='w-[400px]'>
+                  <div className='bg-white border border-slate-200 shadow-lg shadow-slate-200/60 rounded-lg mr-5'>
+                     <div className='p-3'>
+                        <DayPicker
+                           captionLayout='dropdown-buttons'
+                           mode='range'
+                           selected={dateRange}
+                           onSelect={handleDayClick}
+                           pagedNavigation
+                        />
+                     </div>
+                  </div>
+               </div>
             </div>
          </div>
 

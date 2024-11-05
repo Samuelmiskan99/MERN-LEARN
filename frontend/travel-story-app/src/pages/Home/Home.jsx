@@ -33,7 +33,7 @@ const Home = () => {
    })
 
    //range picker
-   const [dateRange, setDateRange] = useState({ form: null, to: null })
+   const [dateRange, setDateRange] = useState({ from: null, to: null })
 
    //searchbar
    const [searchQuery, setSearchQuery] = useState('')
@@ -239,7 +239,7 @@ const Home = () => {
             }}
             style={{ overlay: { backgroundColor: 'rgba(0, 0, 0,0.2)', zIndex: 999 } }}
             appElement={document.getElementById('root')}
-            className='model-box'>
+            className='model-box scrollbar'>
             <AddEditTravelStory
                type={openAddEditModal.type}
                storyInfo={openAddEditModal.data}

@@ -1,4 +1,5 @@
 import moment from 'moment'
+import PropTypes from 'prop-types'
 import { MdOutlineClose } from 'react-icons/md'
 
 const FilterInfoTitle = ({ filterType, filterDates, onClear }) => {
@@ -30,6 +31,14 @@ const FilterInfoTitle = ({ filterType, filterDates, onClear }) => {
          </div>
       )
    )
+}
+FilterInfoTitle.propTypes = {
+   date: PropTypes.shape({
+      from: PropTypes.instanceOf(Date),
+      to: PropTypes.instanceOf(Date),
+   }),
+   onClear: PropTypes.func.isRequired,
+   filterType: PropTypes.string.isRequired,
 }
 
 export default FilterInfoTitle

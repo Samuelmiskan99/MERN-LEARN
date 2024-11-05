@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar'
 import axiosInstance from '../../utils/axiosInstance'
-import { MdAdd } from 'react-icons/md'
 import Modal from 'react-modal'
 
 import { useEffect, useState } from 'react'
@@ -11,6 +10,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import AddEditTravelStory from './AddEditTravelStory'
 import ViewTravelStory from './ViewTravelStory'
+import { BiMessageSquareAdd } from 'react-icons/bi'
 
 import EmptyCards from '../../components/Cards/EmptyCards'
 import { DayPicker } from 'react-day-picker'
@@ -212,7 +212,6 @@ const Home = () => {
                         imageSrc={getEmptyCardImage(filterType)}
                         message={getEmptyCardMessage(filterType)}
                      />
-
                      // <p className='text-center text-gray-500'>No travel stories available.</p>
                   )}
                </div>
@@ -235,7 +234,9 @@ const Home = () => {
          {/* Add and edit travel story modal */}
          <Modal
             isOpen={openAddEditModal.isShow}
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+               setOpenAddEditModal({ isShow: false, type: 'add', data: null })
+            }}
             style={{ overlay: { backgroundColor: 'rgba(0, 0, 0,0.2)', zIndex: 999 } }}
             appElement={document.getElementById('root')}
             className='model-box'>
@@ -269,9 +270,9 @@ const Home = () => {
             />
          </Modal>
          <button
-            className='w-16 h-16 flex items-center justify-center rounded-full bg-primary hover:bg-cyan-400 fixed right-10 bottom-10'
+            className='w-16 h-16 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-blue-500 fixed right-10 bottom-10'
             onClick={() => setOpenAddEditModal({ isShow: true, type: 'add', data: null })}>
-            <MdAdd className='text-[32px] text-white ' />
+            <BiMessageSquareAdd className='text-[32px] text-white ' />
          </button>
 
          <ToastContainer />

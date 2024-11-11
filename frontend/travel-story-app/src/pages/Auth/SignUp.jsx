@@ -37,8 +37,8 @@ const SignUp = () => {
          })
          // Handle successful login response
          if (response.data && response.data.accessToken) {
-            localStorage.setItem('token', response.data.accessToken)
             toast.success('Account created successfully')
+            localStorage.setItem('token', response.data.accessToken)
             navigate('/login')
          }
       } catch (error) {

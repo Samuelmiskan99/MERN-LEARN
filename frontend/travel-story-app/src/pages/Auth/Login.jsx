@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { validateEmail } from '../../utils/helper'
 import axiosInstance from '../../utils/axiosInstance'
 import VIDEO_BACKGROUND from '../../assets/video/bg-video.mp4'
+import { toast } from 'react-toastify'
 
 const Login = () => {
    const [email, setEmail] = useState('')
@@ -29,6 +30,7 @@ const Login = () => {
             password: password,
          })
          if (response.data && response.data.user && response.data.user.accessToken) {
+            toast.success('Login successfully')
             localStorage.setItem('token', response.data.user.accessToken)
             navigate('/dashboard')
          }

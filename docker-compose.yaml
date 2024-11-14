@@ -1,0 +1,10 @@
+services:
+   api:
+      build: ./backend
+      container_name: api_c
+      ports:
+         - 3000:3000
+      volumes:
+         - ./backend:/app
+         - ./backend/uploads:/app/uploads
+      command: npm start # This uses the "start" script in package.json

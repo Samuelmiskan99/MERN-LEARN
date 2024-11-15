@@ -24,7 +24,14 @@ const TravelStory = require('./models/travelStory.model')
 
 const app = express()
 app.use(express.json())
-app.use(cors({ origin: '*' }))
+app.use(
+   cors({
+      origin: ['http://story-travel-mern-v1.vercel.app'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+   })
+)
 
 // Create Account
 app.post('/create-account', async (req, res) => {
